@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace目前可以自定义要唯一，将来面向接口编程时对应dao接口，一个mapper相当于一个dao接口的实现类 -->
+<mapper namespace="teach.dao.StudentDao">
+ <select id="getStudentById" parameterType="String" resultMap="stuCollMapper">
+  select * from student where id=#{_parameter}
+ </select>
+ <select id="getAllCountStudent" resultType="int">
+  select count(*) from student
+ </select>
+ <select id="getAllStudent" resultMap="stuCollMapper">
+  select * from (select rownum as r,s.* from (select * from student order by id)s)
+  where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <resultMap id="stuCollMapper" type="teach.pojo.Student">
+  <association property="college" column="collegeId" select="teach.dao.CollegeDao.getCollegeById"
+               javaType="teach.pojo.College">
+  </association>
+ </resultMap>
+ <update id="changeTheStudent" parameterType="teach.pojo.Teacher">
+  update student
+  <set>
+   <if test="name!=null">name=#{name},</if>
+   <if test="sex!=null">sex=#{sex},</if>
+   <if test="birthday!=null">birthday=to_date(#{birthday},'yyyy-mm-dd'),</if>
+   <if test="grade!=null">grade=to_date(#{grade},'yyyy-mm-dd'),</if>
+   <if test="collegeId!=null">collegeId=#{collegeId}</if>
+  </set>
+  where id=#{id}
+ </update>
+ <insert id="addStudent" parameterType="teach.pojo.Student">
+  insert into student(id,name,sex,birthday,grade,collegeId)
+  values(SUQ_STUDENT.Nextval,#{name},#{sex},to_date(#{birthday},'yyyy-mm-dd'),
+  to_date(#{grade},'yyyy-mm-dd'),#{collegeId})
+ </insert>
+ <delete id="delTheStudent">
+  delete from student where id IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </delete>
+ <select id="stuCountOfName" parameterType="String" resultType="int">
+  select count(*) from student where name like'%'||#{_parameter}||'%'
+ </select>
+ <select id="getStudentOfName" parameterType="Map" resultMap="stuCollMapper">
+  select * from (select rownum as r,s.* from
+  (select * from student where name like '%'||#{searchName}||'%' order by id)s)
+  where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+</mapper>

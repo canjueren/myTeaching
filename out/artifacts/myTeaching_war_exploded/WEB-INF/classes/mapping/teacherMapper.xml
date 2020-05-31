@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace目前可以自定义要唯一，将来面向接口编程时对应dao接口，一个mapper相当于一个dao接口的实现类 -->
+<mapper namespace="teach.dao.TeacherDao">
+ <select id="getAllCountTeacher" resultType="int">
+  select count(*) from teacher
+ </select>
+ <select id="getAllTeacher" resultMap="teaCollMapper">
+  select * from (select rownum as r,s.* from (select * from teacher order by id)s)
+  where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <resultMap id="teaCollMapper" type="teach.pojo.Teacher">
+  <result property="collegeId" column="collegeId"></result>
+  <association property="college" column="collegeId" select="teach.dao.CollegeDao.getCollegeById"
+               javaType="teach.pojo.College">
+  </association>
+ </resultMap>
+ <select id="findAllTeacherId" resultType="teach.pojo.Teacher">
+  select * from teacher  order by id
+ </select>
+ <select id="getTheTeacher" parameterType="String" resultMap="teaCollMapper">
+  select * from teacher where id=#{_parameter}
+ </select>
+ <update id="changeTheTeacher" parameterType="teach.pojo.Teacher">
+  update teacher
+  <set>
+   <if test="name!=null">name=#{name},</if>
+   <if test="sex!=null">sex=#{sex},</if>
+   <if test="birthday!=null">birthday=to_date(#{birthday},'yyyy-mm-dd'),</if>
+   <if test="degree!=null">degree=#{degree},</if>
+   <if test="title!=null">title=#{title},</if>
+   <if test="grade!=null">grade=to_date(#{grade},'yyyy-mm-dd'),</if>
+   <if test="collegeId!=null">collegeId=#{collegeId}</if>
+  </set>
+  where id=#{id}
+ </update>
+ <insert id="addTeacher" parameterType="teach.pojo.Teacher">
+  insert into teacher(id,name,sex,birthday,degree,title,grade,collegeId)
+   values(SUQ_TEACHER.Nextval,#{name},#{sex},to_date(#{birthday},'yyyy-mm-dd'),#{degree},
+   #{title},to_date(#{grade},'yyyy-mm-dd'),#{collegeId})
+ </insert>
+ <delete id="delTheTeacher">
+  delete from teacher where id IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </delete>
+ <select id="teaCountOfName" parameterType="String" resultType="int">
+  select count(*) from teacher where name like'%'||#{_parameter}||'%'
+ </select>
+ <select id="getTeacherOfName" parameterType="Map" resultMap="teaCollMapper">
+  select * from (select rownum as r,s.* from
+  (select * from teacher where name like '%'||#{searchName}||'%' order by id)s)
+  where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+</mapper>

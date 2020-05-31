@@ -1,0 +1,13 @@
+.cztable-table{
+    border-bottom:#cfe1f9 solid 4px;
+    border-right:#cfe1f9 solid 3px;
+    border-top:#cfe1f9 solid 1px;
+    border-left:#cfe1f9 solid 1px;
+}
+/*大网页*/
+.czbtable-table{
+    border-bottom:#E4E4FF solid 1px;
+    border-right:#E4E4FF solid 6px;
+    border-top:#E4E4FF solid 4px;
+    border-left:#E4E4FF solid 1px;
+}

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="hussar-v8-beta:war">
+    <output-path>F:/轻骑兵创建单表项目/轻骑兵创建单表项目/maven_v8_oracle/hussar-v8-beta-0.0.5/target</output-path>
+    <root id="archive" name="hussar-v8-beta-0.0.5.war">
+      <element id="artifact" artifact-name="hussar-v8-beta:war exploded" />
+    </root>
+  </artifact>
+</component>

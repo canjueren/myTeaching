@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace目前可以自定义要唯一，将来面向接口编程时对应dao接口，一个mapper相当于一个dao接口的实现类 -->
+<mapper namespace="teach.dao.UserLoginDao">
+ <select id="loginOn" parameterType="teach.pojo.UserLogin" resultType="teach.pojo.UserLogin">
+  select * from userlogin where userId=#{userId} and password=#{password}
+ </select>
+ <update id="changePwd" parameterType="teach.pojo.UserLogin">
+  update userlogin set password=#{password} where userId=#{userId}
+ </update>
+ <update id="changeName" parameterType="teach.pojo.UserLogin">
+  update userlogin set userName=#{userName} where userId=#{userId}
+ </update>
+ <insert id="addTeacherUser" parameterType="teach.pojo.UserLogin">
+  insert into userLogin(userId,UserName,password,role) values(SUQ_TEACHER.currval,#{userName},111222,1)
+ </insert>
+ <delete id="delTheUser">
+  delete from userLogin where userId IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </delete>
+ <insert id="addStudentUser" parameterType="teach.pojo.UserLogin">
+  insert into userLogin(userId,UserName,password,role) values(SUQ_STUDENT.currval,#{userName},111111,2)
+ </insert>
+ <select id="checkTheUser" parameterType="String" resultType="teach.pojo.UserLogin">
+  select * from userLogin where userId=#{_parameter}
+ </select>
+ <update id="reSetThePwd" parameterType="teach.pojo.UserLogin">
+  update userlogin set password=#{password} where userId=#{userId} and userName=#{userName} and role=#{role}
+ </update>
+</mapper>

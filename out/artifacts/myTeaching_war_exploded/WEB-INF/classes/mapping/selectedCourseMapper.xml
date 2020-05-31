@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace目前可以自定义要唯一，将来面向接口编程时对应dao接口，一个mapper相当于一个dao接口的实现类 -->
+<mapper namespace="teach.dao.SelectedCourseDao">
+ <select id="getTotalStuOfCourse" parameterType="String" resultType="int">
+  select count(*) from selectedcourse where courseId=#{_parameter}
+ </select>
+ <select id="stuOfMyCourse" parameterType="Map" resultMap="studentResultMapper">
+  select * from (select rownum as r,s.* from(select * from selectedcourse where courseId=#{courseId} order by mark)s)
+        where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <resultMap id="studentResultMapper" type="teach.pojo.SelectedCourse">
+  <result property="courseId" column="courseId"></result>
+  <result property="studentId" column="studentId"></result>
+  <result property="mark" column="mark"></result>
+  <association property="student" column="studentId" select="teach.dao.StudentDao.getStudentById"
+               javaType="teach.pojo.Student">
+  </association>
+ </resultMap>
+ <update id="upScore" parameterType="teach.pojo.SelectedCourse">
+  update selectedcourse set mark=#{mark} where courseId=#{courseId} and studentId=#{studentId}
+ </update>
+ <select id="SelectMySelTotal" parameterType="String" resultType="int">
+  select count(*) from selectedcourse where studentId=#{studentId} and mark &lt;=0
+ </select>
+ <select id="SelectMySel" parameterType="Map" resultMap="SelectMySelMapper">
+  select * from (select rownum as r,s.* from
+  (select * from selectedcourse where studentId=#{studentId} and mark &lt; 0 order by courseId)s)
+        where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <resultMap id="SelectMySelMapper" type="teach.pojo.SelectedCourse">
+  <result property="courseId" column="courseId"></result>
+  <result property="studentId" column="studentId"></result>
+  <result property="mark" column="mark"></result>
+  <association property="course" column="courseId" select="teach.dao.CourseDao.getTheCourse"
+               javaType="teach.pojo.Course">
+  </association>
+ </resultMap>
+ <select id="SelectMyGetTotal" parameterType="String" resultType="int">
+  select count(*) from selectedcourse where studentId=#{studentId} and mark &gt;= 0
+ </select>
+ <select id="SelectMyGet" parameterType="Map" resultMap="SelectMyGetMapper">
+  select * from (select rownum as r,s.* from
+  (select * from selectedcourse where studentId=#{studentId} and mark &gt;=0 order by courseId)s)
+  where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <resultMap id="SelectMyGetMapper" type="teach.pojo.SelectedCourse">
+  <result property="courseId" column="courseId"></result>
+  <result property="studentId" column="studentId"></result>
+  <result property="mark" column="mark"></result>
+  <association property="course" column="courseId" select="teach.dao.CourseDao.getTheCourse"
+               javaType="teach.pojo.Course">
+  </association>
+ </resultMap>
+ <delete id="outTheCourse" parameterType="teach.pojo.SelectedCourse">
+  delete from selectedcourse where courseId=#{courseId} and studentId=#{studentId}
+ </delete>
+ <select id="findInTheSelCou" parameterType="teach.pojo.SelectedCourse" resultType="teach.pojo.SelectedCourse">
+  select * from selectedcourse where courseId=#{courseId} and studentId=#{studentId}
+ </select>
+ <insert id="chooseTheCourse" parameterType="teach.pojo.SelectedCourse">
+  insert into selectedcourse(courseId,studentId,mark) values(#{courseId},#{studentId},-1)
+ </insert>
+ <select id="findStuOfCourse" resultType="teach.pojo.SelectedCourse">
+  select * from selectedcourse where courseId IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </select>
+ <delete id="delTheStudentCourse">
+  delete from selectedcourse where studentId IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </delete>
+ <select id="getAllStuOfCouId" parameterType="String" resultType="teach.pojo.SelectedCourse">
+  select * from selectedCourse where courseId=#{_parameter}
+ </select>
+</mapper>

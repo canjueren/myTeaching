@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace目前可以自定义要唯一，将来面向接口编程时对应dao接口，一个mapper相当于一个dao接口的实现类 -->
+<mapper namespace="teach.dao.CollegeDao">
+ <select id="getCollegeById" parameterType="String" resultType="teach.pojo.College">
+  select * from college where collegeId=#{_parameter}
+ </select>
+ <select id="getAllCollege" resultType="teach.pojo.College">
+  select * from college
+ </select>
+ <select id="getCollegeByName" parameterType="String" resultType="teach.pojo.College">
+  select * from college where collegeName=#{_parameter}
+ </select>
+</mapper>

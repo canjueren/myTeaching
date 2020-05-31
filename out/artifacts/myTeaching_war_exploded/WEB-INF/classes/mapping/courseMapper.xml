@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace目前可以自定义要唯一，将来面向接口编程时对应dao接口，一个mapper相当于一个dao接口的实现类 -->
+<mapper namespace="teach.dao.CourseDao">
+ <select id="getTeachCourseCount" parameterType="String" resultType="int">
+  select count(*) from course where teacherId=#{_parameter}
+ </select>
+ <select id="getTeacherCourses" parameterType="String" resultMap="courseTeaMapper">
+select * from (select rownum as r,s.* from (select * from course where teacherId=#{teacherId} order by id)s)
+        where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <select id="getAllCountcourse" resultType="int">
+  select count(*) from course
+ </select>
+ <select id="CourseCountOfName" parameterType="String" resultType="int">
+  select count(*) from course where courseName like'%'||#{_parameter}||'%'
+ </select>
+ <select id="getAllCourse" parameterType="Map" resultMap="courseTeaMapper">
+  select * from (select rownum as r,s.* from (select * from course order by id)s)
+        where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <select id="getCourseOfName" parameterType="Map" resultMap="courseTeaMapper">
+  select * from (select rownum as r,s.* from
+  (select * from course where courseName like '%'||#{name}||'%' order by id)s)
+  where r &lt;=#{endIndex} and r &gt;=#{startIndex}
+ </select>
+ <select id="getTheCourse" parameterType="String" resultMap="courseTeaMapper">
+  select * from course where id=#{_paramerter}
+ </select>
+ <resultMap id="courseTeaMapper" type="teach.pojo.Course">
+  <id property="id" column="id"></id>
+  <association property="teacher" column="teacherId" select="teach.dao.TeacherDao.getTheTeacher"
+               javaType="teach.pojo.Teacher">
+  </association>
+  <collection property="selectedCourse" javaType="ArrayList" column="id"
+              ofType="teach.pojo.SelectedCourse"
+              select="teach.dao.SelectedCourseDao.getAllStuOfCouId">
+  </collection>
+ </resultMap>
+ <update id="changeTheCourse" parameterType="teach.pojo.Course">
+  update course
+  <set>
+   <if test="courseName!=null">courseName=#{courseName},</if>
+   <if test="teacherId!=null">teacherId=#{teacherId},</if>
+   <if test="courseTime!=null">courseTime=#{courseTime},</if>
+   <if test="classRoom!=null">classRoom=#{classRoom},</if>
+   <if test="classWeek!=null">classWeek=#{classWeek},</if>
+   <if test="courseType!=null">courseType=#{courseType},</if>
+   <if test="collegeId!=null">collegeId=#{collegeId},</if>
+   <if test="score!=null">score=#{score}</if>
+  </set>
+  where id=#{id}
+ </update>
+ <insert id="addTheCourse" parameterType="teach.pojo.Course">
+  insert into course(id,courseName,teacherId,courseTime,classRoom,classWeek,courseType,collegeId,score)
+    values(SUQ_COURSE.Nextval,#{courseName},#{teacherId},#{courseTime},#{classRoom},#{classWeek},
+    #{courseType},#{collegeId},#{score})
+ </insert>
+ <delete id="delTheCourse">
+  delete from course where id IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </delete>
+ <select id="findCouOfTeacher" resultType="teach.pojo.Course">
+  select * from course where teacherId IN
+  <foreach collection="list" item="aId" open="(" separator="," close=")">
+   #{aId}
+  </foreach>
+ </select>
+</mapper>
